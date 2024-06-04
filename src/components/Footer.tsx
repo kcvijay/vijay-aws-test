@@ -5,7 +5,7 @@ import pgLogo from '../assets/postgresql.svg';
 
 export default function Footer() {
   return (
-    <div className='flex flex-col items-center'>
+    <div className='w-screen flex flex-col items-center'>
       <div className='flex gap-4 mb-2'>
         <img
           src={viteLogo}

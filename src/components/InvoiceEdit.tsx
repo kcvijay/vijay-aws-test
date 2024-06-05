@@ -1,9 +1,4 @@
-import {
-  Description,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-} from '@headlessui/react';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useState } from 'react';
 import { Link, redirect, useParams } from 'react-router-dom';
 import { invoices } from '../utils/placeholder-data';
@@ -15,7 +10,7 @@ export default function InvoiceEdit() {
   const params = useParams();
 
   const data = invoices.find(
-    (invoice) => invoice.invoiceId === params.invoiceId
+    (invoice) => invoice.invoiceid === params.invoiceid
   );
 
   console.log(data);
@@ -35,9 +30,9 @@ export default function InvoiceEdit() {
               <input
                 className='p-2 rounded-md bg-gray-100 w-32'
                 type='text'
-                name='invoiceId'
-                id='invoiceId'
-                defaultValue={`#${data?.invoiceId}`}
+                name='invoiceid'
+                id='invoiceid'
+                defaultValue={`#${data?.invoiceid}`}
                 disabled
               />
               <fieldset className='flex gap-2 mt-4 items-center'>

@@ -1,6 +1,6 @@
 export const invoices = [
   {
-    invoiceId: 'INV0001',
+    invoiceid: 'INV0001',
     invoicee: 'Company A',
     invoicedDate: '2024-05-01T00:00:00.000Z',
     dueDate: '2024-05-31T00:00:00.000Z',
@@ -9,7 +9,7 @@ export const invoices = [
     state: 'pending',
   },
   {
-    invoiceId: 'INV0002',
+    invoiceid: 'INV0002',
     invoicee: 'Company B',
     invoicedDate: '2024-05-02T00:00:00.000Z',
     dueDate: '2024-06-01T00:00:00.000Z',
@@ -18,7 +18,7 @@ export const invoices = [
     state: 'paid',
   },
   {
-    invoiceId: 'INV0003',
+    invoiceid: 'INV0003',
     invoicee: 'Company C',
     invoicedDate: '2024-05-03T00:00:00.000Z',
     dueDate: '2024-06-02T00:00:00.000Z',
@@ -27,7 +27,7 @@ export const invoices = [
     state: 'unpaid',
   },
   {
-    invoiceId: 'INV0004',
+    invoiceid: 'INV0004',
     invoicee: 'Company D',
     invoicedDate: '2024-05-04T00:00:00.000Z',
     dueDate: '2024-06-03T00:00:00.000Z',
@@ -36,7 +36,7 @@ export const invoices = [
     state: 'pending',
   },
   {
-    invoiceId: 'INV0005',
+    invoiceid: 'INV0005',
     invoicee: 'Company E',
     invoicedDate: '2024-05-05T00:00:00.000Z',
     dueDate: '2024-06-04T00:00:00.000Z',
@@ -45,7 +45,7 @@ export const invoices = [
     state: 'paid',
   },
   {
-    invoiceId: 'INV0006',
+    invoiceid: 'INV0006',
     invoicee: 'Company F',
     invoicedDate: '2024-05-06T00:00:00.000Z',
     dueDate: '2024-06-05T00:00:00.000Z',
@@ -54,7 +54,7 @@ export const invoices = [
     state: 'unpaid',
   },
   {
-    invoiceId: 'INV0007',
+    invoiceid: 'INV0007',
     invoicee: 'Company G',
     invoicedDate: '2024-05-07T00:00:00.000Z',
     dueDate: '2024-06-06T00:00:00.000Z',
@@ -63,7 +63,7 @@ export const invoices = [
     state: 'pending',
   },
   {
-    invoiceId: 'INV0008',
+    invoiceid: 'INV0008',
     invoicee: 'Company H',
     invoicedDate: '2024-05-08T00:00:00.000Z',
     dueDate: '2024-06-07T00:00:00.000Z',
@@ -72,7 +72,7 @@ export const invoices = [
     state: 'paid',
   },
   {
-    invoiceId: 'INV0009',
+    invoiceid: 'INV0009',
     invoicee: 'Company I',
     invoicedDate: '2024-05-09T00:00:00.000Z',
     dueDate: '2024-06-08T00:00:00.000Z',
@@ -81,7 +81,7 @@ export const invoices = [
     state: 'unpaid',
   },
   {
-    invoiceId: 'INV0010',
+    invoiceid: 'INV0010',
     invoicee: 'Company J',
     invoicedDate: '2024-05-10T00:00:00.000Z',
     dueDate: '2024-06-09T00:00:00.000Z',
@@ -90,7 +90,7 @@ export const invoices = [
     state: 'pending',
   },
   {
-    invoiceId: 'INV0011',
+    invoiceid: 'INV0011',
     invoicee: 'Company K',
     invoicedDate: '2024-05-11T00:00:00.000Z',
     dueDate: '2024-06-10T00:00:00.000Z',
@@ -99,7 +99,7 @@ export const invoices = [
     state: 'paid',
   },
   {
-    invoiceId: 'INV0012',
+    invoiceid: 'INV0012',
     invoicee: 'Company L',
     invoicedDate: '2024-05-12T00:00:00.000Z',
     dueDate: '2024-06-11T00:00:00.000Z',
@@ -108,7 +108,7 @@ export const invoices = [
     state: 'unpaid',
   },
   {
-    invoiceId: 'INV0013',
+    invoiceid: 'INV0013',
     invoicee: 'Company M',
     invoicedDate: '2024-05-13T00:00:00.000Z',
     dueDate: '2024-06-12T00:00:00.000Z',
@@ -117,7 +117,7 @@ export const invoices = [
     state: 'pending',
   },
   {
-    invoiceId: 'INV0014',
+    invoiceid: 'INV0014',
     invoicee: 'Company N',
     invoicedDate: '2024-05-14T00:00:00.000Z',
     dueDate: '2024-06-13T00:00:00.000Z',
@@ -126,7 +126,7 @@ export const invoices = [
     state: 'paid',
   },
   {
-    invoiceId: 'INV0015',
+    invoiceid: 'INV0015',
     invoicee: 'Company O',
     invoicedDate: '2024-05-15T00:00:00.000Z',
     dueDate: '2024-06-14T00:00:00.000Z',
@@ -135,7 +135,7 @@ export const invoices = [
     state: 'unpaid',
   },
   {
-    invoiceId: 'INV0016',
+    invoiceid: 'INV0016',
     invoicee: 'Company P',
     invoicedDate: '2024-05-16T00:00:00.000Z',
     dueDate: '2024-06-15T00:00:00.000Z',
@@ -144,7 +144,7 @@ export const invoices = [
     state: 'pending',
   },
   {
-    invoiceId: 'INV0017',
+    invoiceid: 'INV0017',
     invoicee: 'Company Q',
     invoicedDate: '2024-05-17T00:00:00.000Z',
     dueDate: '2024-06-16T00:00:00.000Z',
@@ -153,7 +153,7 @@ export const invoices = [
     state: 'paid',
   },
   {
-    invoiceId: 'INV0018',
+    invoiceid: 'INV0018',
     invoicee: 'Company R',
     invoicedDate: '2024-05-18T00:00:00.000Z',
     dueDate: '2024-06-17T00:00:00.000Z',
@@ -162,7 +162,7 @@ export const invoices = [
     state: 'unpaid',
   },
   {
-    invoiceId: 'INV0019',
+    invoiceid: 'INV0019',
     invoicee: 'Company S',
     invoicedDate: '2024-05-19T00:00:00.000Z',
     dueDate: '2024-06-18T00:00:00.000Z',
@@ -171,7 +171,7 @@ export const invoices = [
     state: 'pending',
   },
   {
-    invoiceId: 'INV0020',
+    invoiceid: 'INV0020',
     invoicee: 'Company T',
     invoicedDate: '2024-05-20T00:00:00.000Z',
     dueDate: '2024-06-19T00:00:00.000Z',

@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.0.4",
+    "@neondatabase/serverless": "^0.9.3",
     "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "pg": "^8.11.5",
     "react": "^18.2.0",

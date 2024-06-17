@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "deploy": "netlify deploy --site=fc78332d-4e0a-4347-a2a0-45e416d7d32a --prod",
+    "deploy:staging": "netlify deploy --site=fc78332d-4e0a-4347-a2a0-45e416d7d32a --prod",
+    "deploy:prod": "netlify deploy --site=79d2c0b4-12a9-4c9b-946b-33889fbccd50 --prod",
     "server": "node --watch server.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

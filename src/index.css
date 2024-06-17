@@ -16,3 +16,17 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+@layer utilities {
+  .bg-invoice {
+    background-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.7),
+        rgba(0, 0, 0, 0.2)
+      ),
+      url('./assets/invoice.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}

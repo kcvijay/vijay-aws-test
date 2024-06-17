@@ -1,7 +1,6 @@
-export function getShortDate(date: Date) {
-  return new Intl.DateTimeFormat('fi-FI').format(date);
+export function getShortDate(date: Date): string {
+  return new Date(date).toLocaleDateString('fi-FI');
 }
-
-export function formatDateForInput(date: string) {
+export function formatDateForInput(date: Date): string {
   return new Date(date).toISOString().split('T')[0];
 }

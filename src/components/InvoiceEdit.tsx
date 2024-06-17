@@ -1,126 +1,149 @@
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
-import { useState } from 'react';
-import { Link, redirect, useParams } from 'react-router-dom';
-import { invoices } from '../utils/placeholder-data';
+import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { formatDateForInput } from '../utils/dates';
+import { ErrorComponent } from './Invoices';
+
+interface Invoice {
+  invoiceid: string;
+  invoicee: string;
+  invoiceddate: Date;
+  duedate: Date;
+  amount: number;
+  currency: string;
+  state: string;
+}
 
 export default function InvoiceEdit() {
-  const [isOpen, setIsOpen] = useState(true);
-
+  const [data, setData] = useState<Invoice>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const params = useParams();
 
-  const data = invoices.find(
-    (invoice) => invoice.invoiceid === params.invoiceid
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:4242/invoices/${params.invoiceid}`
+        );
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setData(data[0]);
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error ? err.message : 'An unknown error occurred'
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-  console.log(data);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <ErrorComponent error={error} />;
+  }
 
   return (
-    <>
-      <Dialog
-        open={isOpen}
-        onClose={() => redirect('/invoices')}
-        className='relative z-50'
-      >
-        <div className='fixed inset-0 bg-black/30' aria-hidden='true' />
-        <div className='fixed inset-0 flex w-screen items-center justify-center p-4'>
-          <DialogPanel className='max-w-lg space-y-4 border bg-white p-6'>
-            <DialogTitle className='font-bold'>Edit invoice</DialogTitle>
-            <form>
+    <div className='h-full md:flex justify-center items-center'>
+      <div className='p-4'>
+        <h2 className='text-gray-500 mb-2'>
+          <span className='font-bold mr-2'>#</span>
+          {data?.invoiceid}
+        </h2>
+        <hr />
+        <form className='mt-6'>
+          <fieldset className='flex gap-2 items-center'>
+            <label className='font-bold w-32' htmlFor='name'>
+              Invoicee
+            </label>
+            <input
+              className='p-2 border rounded-md w-56'
+              type='text'
+              name='name'
+              id='name'
+              defaultValue={data?.invoicee}
+            />
+          </fieldset>
+          <fieldset className='flex gap-2 mt-4 items-center'>
+            <label className='font-bold w-32' htmlFor='invoicedDate'>
+              Invoiced
+            </label>
+            <input
+              className='p-2 border rounded-md w-56'
+              type='date'
+              name='invoicedDate'
+              id='invoicedDate'
+              defaultValue={data && formatDateForInput(data?.invoiceddate)}
+            />
+          </fieldset>
+          <fieldset className='flex gap-2 mt-4 items-center'>
+            <label className='font-bold w-32' htmlFor='dueDate'>
+              Due
+            </label>
+            <input
+              className='p-2 border rounded-md w-56'
+              type='date'
+              name='dueDate'
+              id='dueDate'
+              defaultValue={data && formatDateForInput(data?.duedate)}
+            />
+          </fieldset>
+          <fieldset className='flex gap-2 mt-4 items-center'>
+            <label className='font-bold w-32' htmlFor='amount'>
+              Amount
+            </label>
+            <div>
               <input
-                className='p-2 rounded-md bg-gray-100 w-32'
-                type='text'
-                name='invoiceid'
-                id='invoiceid'
-                defaultValue={`#${data?.invoiceid}`}
-                disabled
+                className='p-2 border rounded-md w-56'
+                type='number'
+                name='amount'
+                id='amount'
+                defaultValue={data?.amount}
               />
-              <fieldset className='flex gap-2 mt-4 items-center'>
-                <label className='w-32' htmlFor='name'>
-                  Name
-                </label>
-                <input
-                  className='p-2 border rounded-md w-56'
-                  type='text'
-                  name='name'
-                  id='name'
-                  defaultValue={data?.invoicee}
-                />
-              </fieldset>
-              <fieldset className='flex gap-2 mt-4 items-center'>
-                <label className='w-32' htmlFor='invoicedDate'>
-                  Invoiced Date
-                </label>
-                <input
-                  className='p-2 border rounded-md w-56'
-                  type='date'
-                  name='invoicedDate'
-                  id='invoicedDate'
-                  defaultValue={formatDateForInput(data?.invoicedDate ?? '')}
-                />
-              </fieldset>
-              <fieldset className='flex gap-2 mt-4 items-center'>
-                <label className='w-32' htmlFor='dueDate'>
-                  Due Date
-                </label>
-                <input
-                  className='p-2 border rounded-md w-56'
-                  type='date'
-                  name='dueDate'
-                  id='dueDate'
-                  defaultValue={formatDateForInput(data?.dueDate ?? '')}
-                />
-              </fieldset>
-              <fieldset className='flex gap-2 mt-4 items-center'>
-                <label className='w-32' htmlFor='amount'>
-                  Amount
-                </label>
-                <div>
-                  <input
-                    className='p-2 border rounded-md w-56'
-                    type='number'
-                    name='amount'
-                    id='amount'
-                    defaultValue={data?.amount}
-                  />
-                </div>
-                <div>
-                  <input
-                    className='p-2 border rounded-md w-20'
-                    type='text'
-                    name='currency'
-                    id='currency'
-                    defaultValue={data?.currency}
-                  />
-                </div>
-              </fieldset>
-              <fieldset className='flex gap-2 mt-4 items-center'>
-                <label className='w-32' htmlFor='state'>
-                  State
-                </label>
-                <input
-                  className='p-2 border rounded-md w-56'
-                  type='text'
-                  name='state'
-                  id='state'
-                  defaultValue={data?.state}
-                />
-              </fieldset>
-            </form>
-            <div className='flex gap-4 items-center justify-end mt-8'>
-              <Link className='text-red-600' to='..'>
+            </div>
+            <div>
+              <input
+                className='p-2 border rounded-md w-20'
+                type='text'
+                name='currency'
+                id='currency'
+                defaultValue={data?.currency}
+              />
+            </div>
+          </fieldset>
+          <fieldset className='flex gap-2 mt-4 items-center'>
+            <label className='font-bold w-32' htmlFor='state'>
+              State
+            </label>
+            <input
+              className='p-2 border rounded-md w-56'
+              type='text'
+              name='state'
+              id='state'
+              defaultValue={data?.state}
+            />
+          </fieldset>
+          <div className='flex gap-4 justify-between items-center mt-8'>
+            <button className='py-2 px-4 bg-red-600 rounded-md text-white'>
+              Delete invoice
+            </button>
+            <div className='flex gap-4 items-center'>
+              <Link className='text-red-600' to='/invoices'>
                 Cancel
               </Link>
-              <Link
-                className='py-2 px-4 bg-green-100 text-green-600 rounded-md'
-                to='..'
-              >
+              <button className='py-2 px-4 bg-green-100 text-green-600 rounded-md'>
                 Save
-              </Link>
+              </button>
             </div>
-          </DialogPanel>
-        </div>
-      </Dialog>
-    </>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }

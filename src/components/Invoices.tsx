@@ -1,5 +1,5 @@
-import { Link, Outlet } from 'react-router-dom';
-import { PencilSquareIcon, TrashIcon } from '../ui/icons';
+import { Link } from 'react-router-dom';
+import { PencilSquareIcon, XCircleIcon } from '../ui/icons';
 import { getShortDate } from '../utils/dates';
 import { useEffect, useState } from 'react';
 import { getShortenedId } from '../utils/shortId';
@@ -7,6 +7,7 @@ import { getShortenedId } from '../utils/shortId';
 export default function Invoices() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,26 +18,33 @@ export default function Invoices() {
         }
         const data = await response.json();
         setData(data);
-
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error ? err.message : 'An unknown error occurred'
+        );
+      } finally {
         setLoading(false);
-      } catch (err: any) {
-        throw new Error(err.message);
       }
     };
     fetchData();
   }, []);
-  if (loading) {
-    return <p>Loading...</p>;
+
+  if (error) {
+    return <ErrorComponent error={error} />;
   }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
-      <Outlet />
       <h1 className='text-2xl font-bold mb-8'>Invoices</h1>
-      <table className='w-full'>
+      <table className='w-full overflow-scroll'>
         <thead>
           <tr className='border bg-gray-300'>
             <th className='p-4 text-start w-20'>#</th>
-            <th className='p-4 text-start'>Company / Person</th>
+            <th className='p-4 text-start'>Invoicee</th>
             <th className='p-4 text-start'>Invoiced Date</th>
             <th className='p-4 text-start'>Due Date</th>
             <th className='p-4 text-center'>Amount</th>
@@ -54,8 +62,8 @@ export default function Invoices() {
 type Invoice = {
   invoiceid: string;
   invoicee: string;
-  invoicedDate: Date;
-  dueDate: Date;
+  invoiceddate: Date;
+  duedate: Date;
   amount: number;
   currency: string;
   state: string;
@@ -65,11 +73,16 @@ function InvoiceList({ invoices }: { invoices: Invoice[] }) {
   return (
     <tbody>
       {invoices.map((invoice: Invoice) => (
-        <tr key={invoice.invoiceid} className='even:bg-gray-50'>
-          <td className='p-4'>{getShortenedId(invoice.invoiceid)}</td>
+        <tr
+          key={invoice.invoiceid}
+          className='even:bg-gray-50 hover:bg-sky-100'
+        >
+          <td className='p-4 text-gray-500'>
+            {getShortenedId(invoice.invoiceid)}
+          </td>
           <td className='p-4'>{invoice.invoicee}</td>
-          <td className='p-4'>{getShortDate(invoice.invoicedDate)}</td>
-          <td className='p-4'>{getShortDate(invoice.dueDate)}</td>
+          <td className='p-4'>{getShortDate(invoice.invoiceddate)}</td>
+          <td className='p-4'>{getShortDate(invoice.duedate)}</td>
           <td className='p-4 text-center'>
             {invoice.amount.toLocaleString('fi-FI')}
           </td>
@@ -93,12 +106,21 @@ function InvoiceList({ invoices }: { invoices: Invoice[] }) {
             <Link className='mr-2' to={`/invoices/${invoice.invoiceid}/edit`}>
               <PencilSquareIcon className='size-6 text-gray-600 hover:text-gray-500' />
             </Link>
-            <button>
-              <TrashIcon className='size-6 text-red-600 hover:text-red-500' />
-            </button>
           </td>
         </tr>
       ))}
     </tbody>
+  );
+}
+
+export function ErrorComponent({ error }: { error: string }) {
+  return (
+    <div className='size-80 mx-auto flex justify-center items-center bg-red-50'>
+      <div className='flex flex-col justify-center items-center gap-4'>
+        <XCircleIcon className='size-12 text-orange-300' />
+        <h2 className='text-2xl text-orange-500'>An error is ocurred.</h2>
+        <p className='text-gray-500'>{error}</p>
+      </div>
+    </div>
   );
 }

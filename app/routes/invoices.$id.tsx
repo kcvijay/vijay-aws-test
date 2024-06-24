@@ -1,51 +1,45 @@
-import { Link, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { formatDateForInput } from '../utils/dates';
-import Error from '../components/Error';
+import {
+  ActionFunctionArgs,
+  json,
+  LoaderFunctionArgs,
+  redirect,
+} from '@remix-run/node';
+import { Form, useActionData, useLoaderData } from '@remix-run/react';
+import { getInvoice, updateInvoice } from '~/actions/crud';
 
-interface Invoice {
-  invoiceid: string;
-  invoicee: string;
-  invoiceddate: Date;
-  duedate: Date;
-  amount: number;
-  currency: string;
-  state: string;
+export async function loader({ params }: LoaderFunctionArgs) {
+  try {
+    const invoice = await getInvoice(params.id!);
+    return { data: invoice[0] };
+  } catch (err: unknown) {
+    throw { error: 'Error' };
+  }
 }
 
+export const action = async ({ params, request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const invoice = {
+    invoicee: formData.get('invoicee') as string,
+    invoiceddate: new Date(formData.get('invoicedDate') as string),
+    duedate: new Date(formData.get('dueDate') as string),
+    amount: Number(formData.get('amount')),
+    currency: formData.get('currency') as string,
+    state: formData.get('state') as string,
+  };
+
+  try {
+    await updateInvoice(params.id as string, invoice);
+    return redirect('/invoices');
+  } catch (error: unknown) {
+    return json({ error: 'Failed to update the invoice' }, { status: 500 });
+  }
+};
+
 export default function InvoiceEdit() {
-  const [data, setData] = useState<Invoice>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
-  const params = useParams();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:4242/invoices/${params.invoiceid}`
-        );
-        if (!response.ok) {
-          throw { error: 'Network response was not ok' };
-        }
-        const data = await response.json();
-        setData(data[0]);
-      } catch (err: unknown) {
-        setError('Error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <Error error={error} />;
-  }
+  const { data } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
 
   return (
     <div className='h-full md:flex justify-center items-center'>
@@ -55,16 +49,16 @@ export default function InvoiceEdit() {
           {data?.invoiceid}
         </h2>
         <hr />
-        <form className='mt-6'>
+        <Form method='post' className='mt-6' reloadDocument>
           <fieldset className='flex gap-2 items-center'>
-            <label className='font-bold w-32' htmlFor='name'>
+            <label className='font-bold w-32' htmlFor='invoicee'>
               Invoicee
             </label>
             <input
               className='p-2 border rounded-md w-56'
               type='text'
-              name='name'
-              id='name'
+              name='invoicee'
+              id='invoicee'
               defaultValue={data?.invoicee}
             />
           </fieldset>
@@ -102,6 +96,7 @@ export default function InvoiceEdit() {
                 type='number'
                 name='amount'
                 id='amount'
+                step='0.01'
                 defaultValue={data?.amount}
               />
             </div>
@@ -135,12 +130,15 @@ export default function InvoiceEdit() {
               <Link className='text-red-600' to='/invoices'>
                 Cancel
               </Link>
-              <button className='py-2 px-4 bg-green-100 text-green-600 rounded-md'>
+              <button
+                type='submit'
+                className='py-2 px-4 bg-green-100 text-green-600 rounded-md'
+              >
                 Save
               </button>
             </div>
           </div>
-        </form>
+        </Form>
       </div>
     </div>
   );

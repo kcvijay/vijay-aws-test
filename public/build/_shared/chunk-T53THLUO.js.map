@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../app/utils/dates.ts"],
-  "sourcesContent": ["// REMIX HMR BEGIN\nimport * as __hmr__ from \"remix:hmr\";\nif (import.meta) {\nimport.meta.hot = __hmr__.createHotContext(\n//@ts-expect-error\n\"app/utils/dates.ts\"\n);\nimport.meta.hot.lastModified = \"1718130742321.5771\";\n}\n// REMIX HMR END\n\nexport function getShortDate(date: Date): string {\n  return new Date(date).toLocaleDateString('fi-FI');\n}\nexport function formatDateForInput(date: Date): string {\n  return new Date(date).toISOString().split('T')[0];\n}\n"],
-  "mappings": ";;;;;AAEA,IAAI,aAAa;AACjB,cAAY,MAAc;AAAA;AAAA,IAE1B;AAAA,EACA;AACA,cAAY,IAAI,eAAe;AAC/B;AAGO,SAAS,aAAa,MAAoB;AAC/C,SAAO,IAAI,KAAK,IAAI,EAAE,mBAAmB,OAAO;AAClD;AACO,SAAS,mBAAmB,MAAoB;AACrD,SAAO,IAAI,KAAK,IAAI,EAAE,YAAY,EAAE,MAAM,GAAG,EAAE,CAAC;AAClD;",
-  "names": []
-}

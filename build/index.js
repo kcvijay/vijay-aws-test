@@ -204,7 +204,7 @@ function BankNotes({ className }) {
     this
   );
 }
-function XCircleIcon({ className }) {
+function PlusIcon({ className }) {
   return /* @__PURE__ */ jsxDEV2(
     "svg",
     {
@@ -219,13 +219,13 @@ function XCircleIcon({ className }) {
         {
           strokeLinecap: "round",
           strokeLinejoin: "round",
-          d: "m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          d: "M12 4.5v15m7.5-7.5h-15"
         },
         void 0,
         !1,
         {
           fileName: "app/ui/icons.tsx",
-          lineNumber: 106,
+          lineNumber: 125,
           columnNumber: 7
         },
         this
@@ -235,7 +235,7 @@ function XCircleIcon({ className }) {
     !1,
     {
       fileName: "app/ui/icons.tsx",
-      lineNumber: 98,
+      lineNumber: 117,
       columnNumber: 5
     },
     this
@@ -246,18 +246,11 @@ function XCircleIcon({ className }) {
 import { jsxDEV as jsxDEV3 } from "react/jsx-dev-runtime";
 function Nav() {
   return /* @__PURE__ */ jsxDEV3("div", { className: "flex  justify-between items-center p-4 bg-sky-600 text-lg text-gray-100", children: [
-    /* @__PURE__ */ jsxDEV3(Link, { to: "/", className: "flex items-center gap-2 text-2xl font-bold", children: [
-      /* @__PURE__ */ jsxDEV3(BankNotes, { className: "size-6" }, void 0, !1, {
-        fileName: "app/components/Nav.tsx",
-        lineNumber: 8,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDEV3("span", { children: "Invoices" }, void 0, !1, {
-        fileName: "app/components/Nav.tsx",
-        lineNumber: 9,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, !0, {
+    /* @__PURE__ */ jsxDEV3(Link, { to: "/", children: /* @__PURE__ */ jsxDEV3(BankNotes, { className: "size-8" }, void 0, !1, {
+      fileName: "app/components/Nav.tsx",
+      lineNumber: 8,
+      columnNumber: 9
+    }, this) }, void 0, !1, {
       fileName: "app/components/Nav.tsx",
       lineNumber: 7,
       columnNumber: 7
@@ -267,19 +260,19 @@ function Nav() {
       {
         className: ({ isActive }) => `inline-block ${isActive ? "font-bold" : ""}`,
         to: "/invoices",
-        children: "Invoices"
+        children: "All Invoices"
       },
       void 0,
       !1,
       {
         fileName: "app/components/Nav.tsx",
-        lineNumber: 12,
+        lineNumber: 11,
         columnNumber: 9
       },
       this
     ) }, void 0, !1, {
       fileName: "app/components/Nav.tsx",
-      lineNumber: 11,
+      lineNumber: 10,
       columnNumber: 7
     }, this)
   ] }, void 0, !0, {
@@ -311,7 +304,7 @@ function Footer() {
 }
 
 // app/tailwind.css?url
-var tailwind_default = "/build/_assets/tailwind-WHMWNMK6.css?url";
+var tailwind_default = "/build/_assets/tailwind-T2DBXAO7.css?url";
 
 // app/root.tsx
 import { jsxDEV as jsxDEV5 } from "react/jsx-dev-runtime";
@@ -392,8 +385,9 @@ function App() {
 // app/routes/invoices._index.tsx
 var invoices_index_exports = {};
 __export(invoices_index_exports, {
-  ErrorComponent: () => ErrorComponent,
-  default: () => Invoices
+  ErrorBoundary: () => ErrorBoundary,
+  default: () => Invoices,
+  loader: () => loader
 });
 import { Link as Link2 } from "react-router-dom";
 
@@ -405,112 +399,141 @@ function formatDateForInput(date) {
   return new Date(date).toISOString().split("T")[0];
 }
 
-// app/routes/invoices._index.tsx
-import { useEffect, useState } from "react";
-
 // app/utils/shortId.ts
 function getShortenedId(id) {
   return id.split("-")[0] + "...";
 }
 
 // app/routes/invoices._index.tsx
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+
+// app/actions/crud.ts
+import { neon } from "@neondatabase/serverless";
+async function getAllInvoices() {
+  return await neon(`${process.env.DATABASE_URL}`)`SELECT * FROM invoices`;
+}
+async function getInvoice(id) {
+  return await neon(`${process.env.DATABASE_URL}`)`SELECT * FROM invoices WHERE invoiceid = ${id}`;
+}
+async function updateInvoice(id, invoice) {
+  let { invoicee, invoiceddate, duedate, amount, currency, state } = invoice;
+  return await neon(`${process.env.DATABASE_URL}`)`
+    UPDATE invoices
+    SET invoicee = ${invoicee},
+        invoiceddate = ${invoiceddate},
+        duedate = ${duedate},
+        amount = ${amount},
+        currency = ${currency},
+        state = ${state}
+    WHERE invoiceid = ${id}
+  `;
+}
+
+// app/routes/invoices._index.tsx
 import { Fragment, jsxDEV as jsxDEV6 } from "react/jsx-dev-runtime";
+var loader = async () => {
+  try {
+    let invoices = await getAllInvoices();
+    return json(invoices);
+  } catch {
+    throw { error: "Error" };
+  }
+};
 function Invoices() {
-  let [data, setData] = useState([]), [loading, setLoading] = useState(!0), [error, setError] = useState("");
-  return useEffect(() => {
-    (async () => {
-      try {
-        let response = await fetch("http://localhost:4242/invoices");
-        if (!response.ok)
-          throw new Error("Network response was not ok");
-        let data2 = await response.json();
-        setData(data2);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred"
-        );
-      } finally {
-        setLoading(!1);
-      }
-    })();
-  }, []), error ? /* @__PURE__ */ jsxDEV6(ErrorComponent, { error }, void 0, !1, {
-    fileName: "app/routes/invoices._index.tsx",
-    lineNumber: 33,
-    columnNumber: 12
-  }, this) : loading ? /* @__PURE__ */ jsxDEV6("div", { children: "Loading..." }, void 0, !1, {
-    fileName: "app/routes/invoices._index.tsx",
-    lineNumber: 37,
-    columnNumber: 12
-  }, this) : /* @__PURE__ */ jsxDEV6(Fragment, { children: [
-    /* @__PURE__ */ jsxDEV6("h1", { className: "text-2xl font-bold mb-8", children: "Invoices" }, void 0, !1, {
+  let data = useLoaderData();
+  return /* @__PURE__ */ jsxDEV6(Fragment, { children: [
+    /* @__PURE__ */ jsxDEV6("div", { className: "flex justify-between items-center gap-2 mb-8", children: [
+      /* @__PURE__ */ jsxDEV6("h1", { className: "text-2xl font-bold", children: "Invoices" }, void 0, !1, {
+        fileName: "app/routes/invoices._index.tsx",
+        lineNumber: 24,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV6(Link2, { to: "/invoices/new", className: "flex gap-2 items-center border border-slate-200 py-2 pl-2 pr-4 rounded-md hover:bg-slate-200", children: [
+        /* @__PURE__ */ jsxDEV6(PlusIcon, { className: "size-5" }, void 0, !1, {
+          fileName: "app/routes/invoices._index.tsx",
+          lineNumber: 26,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV6("span", { children: "Add" }, void 0, !1, {
+          fileName: "app/routes/invoices._index.tsx",
+          lineNumber: 27,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/invoices._index.tsx",
+        lineNumber: 25,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, !0, {
       fileName: "app/routes/invoices._index.tsx",
-      lineNumber: 42,
+      lineNumber: 23,
       columnNumber: 7
     }, this),
     /* @__PURE__ */ jsxDEV6("table", { className: "w-full overflow-scroll", children: [
       /* @__PURE__ */ jsxDEV6("thead", { children: /* @__PURE__ */ jsxDEV6("tr", { className: "border bg-gray-300", children: [
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4 text-start w-20", children: "#" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 46,
+          lineNumber: 33,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4 text-start", children: "Invoicee" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 47,
+          lineNumber: 34,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4 text-start", children: "Invoiced Date" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 48,
+          lineNumber: 35,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4 text-start", children: "Due Date" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 49,
+          lineNumber: 36,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4 text-center", children: "Amount" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 50,
+          lineNumber: 37,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4", children: "Currency" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 51,
+          lineNumber: 38,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4 text-start", children: "State" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 52,
+          lineNumber: 39,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDEV6("th", { className: "p-4" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 53,
+          lineNumber: 40,
           columnNumber: 13
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/invoices._index.tsx",
-        lineNumber: 45,
+        lineNumber: 32,
         columnNumber: 11
       }, this) }, void 0, !1, {
         fileName: "app/routes/invoices._index.tsx",
-        lineNumber: 44,
+        lineNumber: 31,
         columnNumber: 9
       }, this),
       /* @__PURE__ */ jsxDEV6(InvoiceList, { invoices: data }, void 0, !1, {
         fileName: "app/routes/invoices._index.tsx",
-        lineNumber: 56,
+        lineNumber: 43,
         columnNumber: 9
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/invoices._index.tsx",
-      lineNumber: 43,
+      lineNumber: 30,
       columnNumber: 7
     }, this)
   ] }, void 0, !0, {
     fileName: "app/routes/invoices._index.tsx",
-    lineNumber: 41,
+    lineNumber: 22,
     columnNumber: 5
   }, this);
 }
@@ -522,32 +545,32 @@ function InvoiceList({ invoices }) {
       children: [
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4 text-gray-500", children: getShortenedId(invoice.invoiceid) }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 80,
+          lineNumber: 67,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4", children: invoice.invoicee }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 83,
+          lineNumber: 70,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4", children: getShortDate(invoice.invoiceddate) }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 84,
+          lineNumber: 71,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4", children: getShortDate(invoice.duedate) }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 85,
+          lineNumber: 72,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4 text-center", children: invoice.amount.toLocaleString("fi-FI") }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 86,
+          lineNumber: 73,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4 text-center", children: invoice.currency }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 89,
+          lineNumber: 76,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4 text-start", children: /* @__PURE__ */ jsxDEV6(
@@ -560,26 +583,26 @@ function InvoiceList({ invoices }) {
           !1,
           {
             fileName: "app/routes/invoices._index.tsx",
-            lineNumber: 91,
+            lineNumber: 78,
             columnNumber: 13
           },
           this
         ) }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 90,
+          lineNumber: 77,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDEV6("td", { className: "p-4 text-center flex", children: /* @__PURE__ */ jsxDEV6(Link2, { className: "mr-2", to: `/invoices/${invoice.invoiceid}`, children: /* @__PURE__ */ jsxDEV6(PencilSquareIcon, { className: "size-6 text-gray-600 hover:text-gray-500" }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 107,
+          lineNumber: 94,
           columnNumber: 15
         }, this) }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 106,
+          lineNumber: 93,
           columnNumber: 13
         }, this) }, void 0, !1, {
           fileName: "app/routes/invoices._index.tsx",
-          lineNumber: 105,
+          lineNumber: 92,
           columnNumber: 11
         }, this)
       ]
@@ -588,40 +611,24 @@ function InvoiceList({ invoices }) {
     !0,
     {
       fileName: "app/routes/invoices._index.tsx",
-      lineNumber: 76,
+      lineNumber: 63,
       columnNumber: 9
     },
     this
   )) }, void 0, !1, {
     fileName: "app/routes/invoices._index.tsx",
-    lineNumber: 74,
+    lineNumber: 61,
     columnNumber: 5
   }, this);
 }
-function ErrorComponent({ error }) {
-  return /* @__PURE__ */ jsxDEV6("div", { className: "size-80 mx-auto flex justify-center items-center bg-red-50", children: /* @__PURE__ */ jsxDEV6("div", { className: "flex flex-col justify-center items-center gap-4", children: [
-    /* @__PURE__ */ jsxDEV6(XCircleIcon, { className: "size-12 text-orange-300" }, void 0, !1, {
-      fileName: "app/routes/invoices._index.tsx",
-      lineNumber: 120,
-      columnNumber: 9
-    }, this),
-    /* @__PURE__ */ jsxDEV6("h2", { className: "text-2xl text-orange-500", children: "An error is ocurred." }, void 0, !1, {
-      fileName: "app/routes/invoices._index.tsx",
-      lineNumber: 121,
-      columnNumber: 9
-    }, this),
-    /* @__PURE__ */ jsxDEV6("p", { className: "text-gray-500", children: error }, void 0, !1, {
-      fileName: "app/routes/invoices._index.tsx",
-      lineNumber: 122,
-      columnNumber: 9
-    }, this)
-  ] }, void 0, !0, {
+function ErrorBoundary({ error }) {
+  return /* @__PURE__ */ jsxDEV6("div", { className: "p-4 bg-red-100 text-red-600", children: /* @__PURE__ */ jsxDEV6("p", { children: error instanceof Error ? error.message : "An error ocurred while loading the data." }, void 0, !1, {
     fileName: "app/routes/invoices._index.tsx",
-    lineNumber: 119,
+    lineNumber: 106,
     columnNumber: 7
   }, this) }, void 0, !1, {
     fileName: "app/routes/invoices._index.tsx",
-    lineNumber: 118,
+    lineNumber: 105,
     columnNumber: 5
   }, this);
 }
@@ -629,119 +636,96 @@ function ErrorComponent({ error }) {
 // app/routes/invoices.$id.tsx
 var invoices_id_exports = {};
 __export(invoices_id_exports, {
-  default: () => InvoiceEdit
+  action: () => action,
+  default: () => InvoiceEdit,
+  loader: () => loader2
 });
-import { Link as Link3, useParams } from "react-router-dom";
-import { useEffect as useEffect2, useState as useState2 } from "react";
-
-// app/components/Error.tsx
+import { Link as Link3 } from "react-router-dom";
+import {
+  json as json2,
+  redirect
+} from "@remix-run/node";
+import { Form, useActionData, useLoaderData as useLoaderData2 } from "@remix-run/react";
 import { jsxDEV as jsxDEV7 } from "react/jsx-dev-runtime";
-function ErrorComponent2({ error }) {
-  return /* @__PURE__ */ jsxDEV7("div", { className: "size-80 mx-auto flex justify-center items-center bg-red-50", children: /* @__PURE__ */ jsxDEV7("div", { className: "flex flex-col justify-center items-center gap-4", children: [
-    /* @__PURE__ */ jsxDEV7("h2", { className: "text-2xl text-orange-500", children: "An error is ocurred." }, void 0, !1, {
-      fileName: "app/components/Error.tsx",
-      lineNumber: 5,
-      columnNumber: 9
-    }, this),
-    /* @__PURE__ */ jsxDEV7("p", { className: "text-gray-500", children: error }, void 0, !1, {
-      fileName: "app/components/Error.tsx",
-      lineNumber: 6,
-      columnNumber: 9
-    }, this)
-  ] }, void 0, !0, {
-    fileName: "app/components/Error.tsx",
-    lineNumber: 4,
-    columnNumber: 7
-  }, this) }, void 0, !1, {
-    fileName: "app/components/Error.tsx",
-    lineNumber: 3,
-    columnNumber: 5
-  }, this);
+async function loader2({ params }) {
+  try {
+    return { data: (await getInvoice(params.id))[0] };
+  } catch {
+    throw { error: "Error" };
+  }
 }
-
-// app/routes/invoices.$id.tsx
-import { jsxDEV as jsxDEV8 } from "react/jsx-dev-runtime";
+var action = async ({ params, request }) => {
+  let formData = await request.formData(), invoice = {
+    invoicee: formData.get("invoicee"),
+    invoiceddate: new Date(formData.get("invoicedDate")),
+    duedate: new Date(formData.get("dueDate")),
+    amount: Number(formData.get("amount")),
+    currency: formData.get("currency"),
+    state: formData.get("state")
+  };
+  try {
+    return await updateInvoice(params.id, invoice), redirect("/invoices");
+  } catch {
+    return json2({ error: "Failed to update the invoice" }, { status: 500 });
+  }
+};
 function InvoiceEdit() {
-  let [data, setData] = useState2(), [loading, setLoading] = useState2(!0), [error, setError] = useState2(""), params = useParams();
-  return useEffect2(() => {
-    (async () => {
-      try {
-        let response = await fetch(
-          `http://localhost:4242/invoices/${params.invoiceid}`
-        );
-        if (!response.ok)
-          throw { error: "Network response was not ok" };
-        let data2 = await response.json();
-        setData(data2[0]);
-      } catch {
-        setError("Error");
-      } finally {
-        setLoading(!1);
-      }
-    })();
-  }, []), loading ? /* @__PURE__ */ jsxDEV8("div", { children: "Loading..." }, void 0, !1, {
-    fileName: "app/routes/invoices.$id.tsx",
-    lineNumber: 43,
-    columnNumber: 12
-  }, this) : error ? /* @__PURE__ */ jsxDEV8(ErrorComponent2, { error }, void 0, !1, {
-    fileName: "app/routes/invoices.$id.tsx",
-    lineNumber: 47,
-    columnNumber: 12
-  }, this) : /* @__PURE__ */ jsxDEV8("div", { className: "h-full md:flex justify-center items-center", children: /* @__PURE__ */ jsxDEV8("div", { className: "p-4", children: [
-    /* @__PURE__ */ jsxDEV8("h2", { className: "text-gray-500 mb-2", children: [
-      /* @__PURE__ */ jsxDEV8("span", { className: "font-bold mr-2", children: "#" }, void 0, !1, {
+  let { data } = useLoaderData2(), actionData = useActionData();
+  return /* @__PURE__ */ jsxDEV7("div", { className: "h-full md:flex justify-center items-center", children: /* @__PURE__ */ jsxDEV7("div", { className: "p-4", children: [
+    /* @__PURE__ */ jsxDEV7("h2", { className: "text-gray-500 mb-2", children: [
+      /* @__PURE__ */ jsxDEV7("span", { className: "font-bold mr-2", children: "#" }, void 0, !1, {
         fileName: "app/routes/invoices.$id.tsx",
-        lineNumber: 54,
+        lineNumber: 48,
         columnNumber: 11
       }, this),
       data?.invoiceid
     ] }, void 0, !0, {
       fileName: "app/routes/invoices.$id.tsx",
-      lineNumber: 53,
+      lineNumber: 47,
       columnNumber: 9
     }, this),
-    /* @__PURE__ */ jsxDEV8("hr", {}, void 0, !1, {
+    /* @__PURE__ */ jsxDEV7("hr", {}, void 0, !1, {
       fileName: "app/routes/invoices.$id.tsx",
-      lineNumber: 57,
+      lineNumber: 51,
       columnNumber: 9
     }, this),
-    /* @__PURE__ */ jsxDEV8("form", { className: "mt-6", children: [
-      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 items-center", children: [
-        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "name", children: "Invoicee" }, void 0, !1, {
+    /* @__PURE__ */ jsxDEV7(Form, { method: "post", className: "mt-6", reloadDocument: !0, children: [
+      /* @__PURE__ */ jsxDEV7("fieldset", { className: "flex gap-2 items-center", children: [
+        /* @__PURE__ */ jsxDEV7("label", { className: "font-bold w-32", htmlFor: "invoicee", children: "Invoicee" }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 60,
+          lineNumber: 54,
           columnNumber: 13
         }, this),
-        /* @__PURE__ */ jsxDEV8(
+        /* @__PURE__ */ jsxDEV7(
           "input",
           {
             className: "p-2 border rounded-md w-56",
             type: "text",
-            name: "name",
-            id: "name",
+            name: "invoicee",
+            id: "invoicee",
             defaultValue: data?.invoicee
           },
           void 0,
           !1,
           {
             fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 63,
+            lineNumber: 57,
             columnNumber: 13
           },
           this
         )
       ] }, void 0, !0, {
         fileName: "app/routes/invoices.$id.tsx",
-        lineNumber: 59,
+        lineNumber: 53,
         columnNumber: 11
       }, this),
-      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
-        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "invoicedDate", children: "Invoiced" }, void 0, !1, {
+      /* @__PURE__ */ jsxDEV7("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV7("label", { className: "font-bold w-32", htmlFor: "invoicedDate", children: "Invoiced" }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 72,
+          lineNumber: 66,
           columnNumber: 13
         }, this),
-        /* @__PURE__ */ jsxDEV8(
+        /* @__PURE__ */ jsxDEV7(
           "input",
           {
             className: "p-2 border rounded-md w-56",
@@ -754,23 +738,23 @@ function InvoiceEdit() {
           !1,
           {
             fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 75,
+            lineNumber: 69,
             columnNumber: 13
           },
           this
         )
       ] }, void 0, !0, {
         fileName: "app/routes/invoices.$id.tsx",
-        lineNumber: 71,
+        lineNumber: 65,
         columnNumber: 11
       }, this),
-      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
-        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "dueDate", children: "Due" }, void 0, !1, {
+      /* @__PURE__ */ jsxDEV7("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV7("label", { className: "font-bold w-32", htmlFor: "dueDate", children: "Due" }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 84,
+          lineNumber: 78,
           columnNumber: 13
         }, this),
-        /* @__PURE__ */ jsxDEV8(
+        /* @__PURE__ */ jsxDEV7(
           "input",
           {
             className: "p-2 border rounded-md w-56",
@@ -783,45 +767,46 @@ function InvoiceEdit() {
           !1,
           {
             fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 87,
+            lineNumber: 81,
             columnNumber: 13
           },
           this
         )
       ] }, void 0, !0, {
         fileName: "app/routes/invoices.$id.tsx",
-        lineNumber: 83,
+        lineNumber: 77,
         columnNumber: 11
       }, this),
-      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
-        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "amount", children: "Amount" }, void 0, !1, {
+      /* @__PURE__ */ jsxDEV7("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV7("label", { className: "font-bold w-32", htmlFor: "amount", children: "Amount" }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 96,
+          lineNumber: 90,
           columnNumber: 13
         }, this),
-        /* @__PURE__ */ jsxDEV8("div", { children: /* @__PURE__ */ jsxDEV8(
+        /* @__PURE__ */ jsxDEV7("div", { children: /* @__PURE__ */ jsxDEV7(
           "input",
           {
             className: "p-2 border rounded-md w-56",
             type: "number",
             name: "amount",
             id: "amount",
+            step: "0.01",
             defaultValue: data?.amount
           },
           void 0,
           !1,
           {
             fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 100,
+            lineNumber: 94,
             columnNumber: 15
           },
           this
         ) }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 99,
+          lineNumber: 93,
           columnNumber: 13
         }, this),
-        /* @__PURE__ */ jsxDEV8("div", { children: /* @__PURE__ */ jsxDEV8(
+        /* @__PURE__ */ jsxDEV7("div", { children: /* @__PURE__ */ jsxDEV7(
           "input",
           {
             className: "p-2 border rounded-md w-20",
@@ -834,27 +819,27 @@ function InvoiceEdit() {
           !1,
           {
             fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 109,
+            lineNumber: 104,
             columnNumber: 15
           },
           this
         ) }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 108,
+          lineNumber: 103,
           columnNumber: 13
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/invoices.$id.tsx",
-        lineNumber: 95,
+        lineNumber: 89,
         columnNumber: 11
       }, this),
-      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
-        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "state", children: "State" }, void 0, !1, {
+      /* @__PURE__ */ jsxDEV7("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV7("label", { className: "font-bold w-32", htmlFor: "state", children: "State" }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 119,
+          lineNumber: 114,
           columnNumber: 13
         }, this),
-        /* @__PURE__ */ jsxDEV8(
+        /* @__PURE__ */ jsxDEV7(
           "input",
           {
             className: "p-2 border rounded-md w-56",
@@ -867,55 +852,326 @@ function InvoiceEdit() {
           !1,
           {
             fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 122,
+            lineNumber: 117,
             columnNumber: 13
           },
           this
         )
       ] }, void 0, !0, {
         fileName: "app/routes/invoices.$id.tsx",
-        lineNumber: 118,
+        lineNumber: 113,
         columnNumber: 11
       }, this),
-      /* @__PURE__ */ jsxDEV8("div", { className: "flex gap-4 justify-between items-center mt-8", children: [
-        /* @__PURE__ */ jsxDEV8("button", { className: "py-2 px-4 bg-red-600 rounded-md text-white", children: "Delete invoice" }, void 0, !1, {
+      /* @__PURE__ */ jsxDEV7("div", { className: "flex gap-4 justify-between items-center mt-8", children: [
+        /* @__PURE__ */ jsxDEV7("button", { className: "py-2 px-4 bg-red-600 rounded-md text-white", children: "Delete invoice" }, void 0, !1, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 131,
+          lineNumber: 126,
           columnNumber: 13
         }, this),
-        /* @__PURE__ */ jsxDEV8("div", { className: "flex gap-4 items-center", children: [
-          /* @__PURE__ */ jsxDEV8(Link3, { className: "text-red-600", to: "/invoices", children: "Cancel" }, void 0, !1, {
+        /* @__PURE__ */ jsxDEV7("div", { className: "flex gap-4 items-center", children: [
+          /* @__PURE__ */ jsxDEV7(Link3, { className: "text-red-600", to: "/invoices", children: "Cancel" }, void 0, !1, {
             fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 135,
+            lineNumber: 130,
             columnNumber: 15
           }, this),
-          /* @__PURE__ */ jsxDEV8("button", { className: "py-2 px-4 bg-green-100 text-green-600 rounded-md", children: "Save" }, void 0, !1, {
-            fileName: "app/routes/invoices.$id.tsx",
-            lineNumber: 138,
-            columnNumber: 15
-          }, this)
+          /* @__PURE__ */ jsxDEV7(
+            "button",
+            {
+              type: "submit",
+              className: "py-2 px-4 bg-green-100 text-green-600 rounded-md",
+              children: "Save"
+            },
+            void 0,
+            !1,
+            {
+              fileName: "app/routes/invoices.$id.tsx",
+              lineNumber: 133,
+              columnNumber: 15
+            },
+            this
+          )
         ] }, void 0, !0, {
           fileName: "app/routes/invoices.$id.tsx",
-          lineNumber: 134,
+          lineNumber: 129,
           columnNumber: 13
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/invoices.$id.tsx",
-        lineNumber: 130,
+        lineNumber: 125,
         columnNumber: 11
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/invoices.$id.tsx",
-      lineNumber: 58,
+      lineNumber: 52,
       columnNumber: 9
     }, this)
   ] }, void 0, !0, {
     fileName: "app/routes/invoices.$id.tsx",
-    lineNumber: 52,
+    lineNumber: 46,
     columnNumber: 7
   }, this) }, void 0, !1, {
     fileName: "app/routes/invoices.$id.tsx",
-    lineNumber: 51,
+    lineNumber: 45,
+    columnNumber: 5
+  }, this);
+}
+
+// app/routes/invoices.new.tsx
+var invoices_new_exports = {};
+__export(invoices_new_exports, {
+  default: () => AddNewInvoice
+});
+import { Form as Form2, Link as Link4 } from "@remix-run/react";
+import { jsxDEV as jsxDEV8 } from "react/jsx-dev-runtime";
+function AddNewInvoice() {
+  return /* @__PURE__ */ jsxDEV8("div", { children: /* @__PURE__ */ jsxDEV8("section", { className: "w-full h-full grid place-items-center", children: [
+    /* @__PURE__ */ jsxDEV8("h2", { className: "mb-2 font-bold text-2xl", children: "New Invoice" }, void 0, !1, {
+      fileName: "app/routes/invoices.new.tsx",
+      lineNumber: 7,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV8(Form2, { method: "post", className: "mt-6", reloadDocument: !0, children: [
+      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 items-center", children: [
+        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "invoicee", children: "Invoicee" }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 10,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV8(
+          "input",
+          {
+            className: "p-2 border rounded-md w-56",
+            type: "text",
+            name: "invoicee",
+            id: "invoicee",
+            placeholder: "Company Oy"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/invoices.new.tsx",
+            lineNumber: 13,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/invoices.new.tsx",
+        lineNumber: 9,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "invoicedDate", children: "Invoiced" }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 22,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV8(
+          "input",
+          {
+            className: "p-2 border rounded-md w-56",
+            type: "date",
+            name: "invoicedDate",
+            id: "invoicedDate"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/invoices.new.tsx",
+            lineNumber: 25,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/invoices.new.tsx",
+        lineNumber: 21,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "dueDate", children: "Due" }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 33,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV8(
+          "input",
+          {
+            className: "p-2 border rounded-md w-56",
+            type: "date",
+            name: "dueDate",
+            id: "dueDate"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/invoices.new.tsx",
+            lineNumber: 36,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/invoices.new.tsx",
+        lineNumber: 32,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "amount", children: "Amount" }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 44,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV8("div", { children: /* @__PURE__ */ jsxDEV8(
+          "input",
+          {
+            className: "p-2 border rounded-md w-56",
+            type: "number",
+            name: "amount",
+            id: "amount",
+            placeholder: "0.00",
+            step: "0.01"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/invoices.new.tsx",
+            lineNumber: 48,
+            columnNumber: 15
+          },
+          this
+        ) }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 47,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV8("div", { children: /* @__PURE__ */ jsxDEV8(
+          "select",
+          {
+            name: "currency",
+            id: "currency",
+            className: "p-2 border rounded-md w-20",
+            defaultValue: "eur",
+            children: [
+              /* @__PURE__ */ jsxDEV8("option", { value: "eur", children: "EUR" }, void 0, !1, {
+                fileName: "app/routes/invoices.new.tsx",
+                lineNumber: 64,
+                columnNumber: 17
+              }, this),
+              /* @__PURE__ */ jsxDEV8("option", { value: "gbp", children: "GBP" }, void 0, !1, {
+                fileName: "app/routes/invoices.new.tsx",
+                lineNumber: 65,
+                columnNumber: 17
+              }, this),
+              /* @__PURE__ */ jsxDEV8("option", { value: "usd", children: "USD" }, void 0, !1, {
+                fileName: "app/routes/invoices.new.tsx",
+                lineNumber: 66,
+                columnNumber: 17
+              }, this)
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/routes/invoices.new.tsx",
+            lineNumber: 58,
+            columnNumber: 15
+          },
+          this
+        ) }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 57,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/invoices.new.tsx",
+        lineNumber: 43,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV8("fieldset", { className: "flex gap-2 mt-4 items-center", children: [
+        /* @__PURE__ */ jsxDEV8("label", { className: "font-bold w-32", htmlFor: "state", children: "State" }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 71,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV8(
+          "select",
+          {
+            name: "state",
+            id: "state",
+            className: "p-2 border rounded-md w-56",
+            defaultValue: "pending",
+            children: [
+              /* @__PURE__ */ jsxDEV8("option", { value: "pending", children: "Pending" }, void 0, !1, {
+                fileName: "app/routes/invoices.new.tsx",
+                lineNumber: 80,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV8("option", { value: "paid", children: "Paid" }, void 0, !1, {
+                fileName: "app/routes/invoices.new.tsx",
+                lineNumber: 81,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV8("option", { value: "unpaid", children: "Unpaid" }, void 0, !1, {
+                fileName: "app/routes/invoices.new.tsx",
+                lineNumber: 82,
+                columnNumber: 15
+              }, this)
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/routes/invoices.new.tsx",
+            lineNumber: 74,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/invoices.new.tsx",
+        lineNumber: 70,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV8("div", { className: "flex gap-4 justify-between items-center mt-8", children: [
+        /* @__PURE__ */ jsxDEV8(Link4, { className: "text-red-600", to: "/invoices", children: "Cancel" }, void 0, !1, {
+          fileName: "app/routes/invoices.new.tsx",
+          lineNumber: 86,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV8(
+          "button",
+          {
+            type: "submit",
+            className: "py-2 px-4 bg-green-100 text-green-600 rounded-md",
+            children: "Save"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/invoices.new.tsx",
+            lineNumber: 89,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/invoices.new.tsx",
+        lineNumber: 85,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/routes/invoices.new.tsx",
+      lineNumber: 8,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/routes/invoices.new.tsx",
+    lineNumber: 6,
+    columnNumber: 7
+  }, this) }, void 0, !1, {
+    fileName: "app/routes/invoices.new.tsx",
+    lineNumber: 5,
     columnNumber: 5
   }, this);
 }
@@ -927,19 +1183,23 @@ __export(index_exports, {
 });
 import { jsxDEV as jsxDEV9 } from "react/jsx-dev-runtime";
 function App2() {
-  return /* @__PURE__ */ jsxDEV9("div", { className: "h-full w-full flex flex-col justify-center items-center", children: /* @__PURE__ */ jsxDEV9("h2", { className: "text-3xl font-bold capitalize", children: "view and manage invoices" }, void 0, !1, {
+  return /* @__PURE__ */ jsxDEV9("div", { className: "h-full", children: /* @__PURE__ */ jsxDEV9("section", { className: "flex gap-6 items-center", children: /* @__PURE__ */ jsxDEV9("h2", { className: "text-[5vw] font-bold text-slate-800 capitalize", children: "Invoices" }, void 0, !1, {
     fileName: "app/routes/_index.tsx",
-    lineNumber: 6,
+    lineNumber: 5,
+    columnNumber: 9
+  }, this) }, void 0, !1, {
+    fileName: "app/routes/_index.tsx",
+    lineNumber: 4,
     columnNumber: 7
   }, this) }, void 0, !1, {
     fileName: "app/routes/_index.tsx",
-    lineNumber: 5,
+    lineNumber: 3,
     columnNumber: 5
   }, this);
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-SZZWNFKH.js", imports: ["/build/_shared/chunk-O4BRYNJ4.js", "/build/_shared/chunk-C7BIZT6C.js", "/build/_shared/chunk-KDD6VS37.js", "/build/_shared/chunk-U4FRFQSK.js", "/build/_shared/chunk-XGOTYLZ5.js", "/build/_shared/chunk-7M6SC7J5.js", "/build/_shared/chunk-WHTWFBLJ.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-NOW3WYGX.js", imports: ["/build/_shared/chunk-ZWUAJJMP.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-CC346I6W.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/invoices.$id": { id: "routes/invoices.$id", parentId: "root", path: "invoices/:id", index: void 0, caseSensitive: void 0, module: "/build/routes/invoices.$id-SUQXRVQM.js", imports: ["/build/_shared/chunk-T53THLUO.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/invoices._index": { id: "routes/invoices._index", parentId: "root", path: "invoices", index: !0, caseSensitive: void 0, module: "/build/routes/invoices._index-MO37MZML.js", imports: ["/build/_shared/chunk-T53THLUO.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "3d80b38b", hmr: { runtime: "/build/_shared/chunk-WHTWFBLJ.js", timestamp: 1718785179096 }, url: "/build/manifest-3D80B38B.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-DE2SZ5VI.js", imports: ["/build/_shared/chunk-O4BRYNJ4.js", "/build/_shared/chunk-OUWR2FA2.js", "/build/_shared/chunk-U4FRFQSK.js", "/build/_shared/chunk-WHTWFBLJ.js", "/build/_shared/chunk-XGOTYLZ5.js", "/build/_shared/chunk-7M6SC7J5.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-7LBFG7YW.js", imports: ["/build/_shared/chunk-TYZFC4SH.js"], hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-46FPZBU6.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/invoices.$id": { id: "routes/invoices.$id", parentId: "root", path: "invoices/:id", index: void 0, caseSensitive: void 0, module: "/build/routes/invoices.$id-FJWXCWPA.js", imports: ["/build/_shared/chunk-T5SKRTMX.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/invoices._index": { id: "routes/invoices._index", parentId: "root", path: "invoices", index: !0, caseSensitive: void 0, module: "/build/routes/invoices._index-ORZFIRJR.js", imports: ["/build/_shared/chunk-T5SKRTMX.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !0 }, "routes/invoices.new": { id: "routes/invoices.new", parentId: "root", path: "invoices/new", index: void 0, caseSensitive: void 0, module: "/build/routes/invoices.new-P4AVRONY.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "e339e01f", hmr: { runtime: "/build/_shared/chunk-WHTWFBLJ.js", timestamp: 1719210140593 }, url: "/build/manifest-E339E01F.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "development", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, unstable_singleFetch: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
@@ -966,6 +1226,14 @@ var mode = "development", assetsBuildDirectory = "public/build", future = { v3_f
     index: void 0,
     caseSensitive: void 0,
     module: invoices_id_exports
+  },
+  "routes/invoices.new": {
+    id: "routes/invoices.new",
+    parentId: "root",
+    path: "invoices/new",
+    index: void 0,
+    caseSensitive: void 0,
+    module: invoices_new_exports
   },
   "routes/_index": {
     id: "routes/_index",

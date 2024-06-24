@@ -1,45 +1,32 @@
 import { Link } from 'react-router-dom';
-import { PencilSquareIcon, XCircleIcon } from '../ui/icons';
+import { PencilSquareIcon, PlusIcon } from '../ui/icons';
 import { getShortDate } from '../utils/dates';
-import { useEffect, useState } from 'react';
 import { getShortenedId } from '../utils/shortId';
+import { json, LoaderFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+import { getAllInvoices } from '~/actions/crud';
+
+export const loader: LoaderFunction = async () => {
+  try {
+    const invoices = await getAllInvoices();
+    return json(invoices);
+  } catch (err: unknown) {
+    throw { error: 'Error' };
+  }
+};
 
 export default function Invoices() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:4242/invoices');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setData(data);
-      } catch (err: unknown) {
-        setError(
-          err instanceof Error ? err.message : 'An unknown error occurred'
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  if (error) {
-    return <ErrorComponent error={error} />;
-  }
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const data = useLoaderData<typeof loader>();
 
   return (
     <>
-      <h1 className='text-2xl font-bold mb-8'>Invoices</h1>
+      <div className='flex justify-between items-center gap-2 mb-8'>
+        <h1 className='text-2xl font-bold'>Invoices</h1>
+        <Link to='/invoices/new' className='flex gap-2 items-center border border-slate-200 py-2 pl-2 pr-4 rounded-md hover:bg-slate-200'>
+          <PlusIcon className='size-5' />
+          <span>Add</span>
+        </Link>
+      </div>
       <table className='w-full overflow-scroll'>
         <thead>
           <tr className='border bg-gray-300'>
@@ -113,14 +100,14 @@ function InvoiceList({ invoices }: { invoices: Invoice[] }) {
   );
 }
 
-export function ErrorComponent({ error }: { error: string }) {
+export function ErrorBoundary({ error }: { error: any }) {
   return (
-    <div className='size-80 mx-auto flex justify-center items-center bg-red-50'>
-      <div className='flex flex-col justify-center items-center gap-4'>
-        <XCircleIcon className='size-12 text-orange-300' />
-        <h2 className='text-2xl text-orange-500'>An error is ocurred.</h2>
-        <p className='text-gray-500'>{error}</p>
-      </div>
+    <div className='p-4 bg-red-100 text-red-600'>
+      <p>
+        {error instanceof Error
+          ? error.message
+          : 'An error ocurred while loading the data.'}
+      </p>
     </div>
   );
 }
